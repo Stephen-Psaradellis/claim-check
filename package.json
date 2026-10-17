@@ -1,0 +1,12 @@
+{
+  "name": "claim-check",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Paste a cold 'your website has problems' email and your address; see which claims are true.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx wrangler@4 dev",
+    "test": "node --test"
+  }
+}

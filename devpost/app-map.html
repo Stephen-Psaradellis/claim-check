@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claim Check app map</title>
+<style>
+  :root { --bg: #fbfaf7; --ink: #1d1d1b; --muted: #5f5d57; --line: #d9d5cc; --card: #fff; --accent: #1f5f8b; --true: #9b2c1f; --false: #2f6b3a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17181a; --ink: #ebe9e4; --muted: #a8a59d; --line: #3a3b3e; --card: #202124; --accent: #7fb6dd; --true: #e58b7c; --false: #8cc79a; }
+  }
+  body { background: var(--bg); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; }
+  main { max-width: 46rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  h1 { font-size: 1.7rem; margin: 0 0 .25rem; }
+  h2 { font-size: 1.15rem; margin: 2.2rem 0 .6rem; border-top: 1px solid var(--line); padding-top: 1.2rem; }
+  p.lede { color: var(--muted); margin-top: 0; }
+  code { font: .9em ui-monospace, Consolas, monospace; background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 0 .25em; overflow-wrap: anywhere; }
+  ol.route > li { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem; margin: .7rem 0; }
+  ol.route > li strong { display: block; }
+  svg { width: 100%; height: auto; display: block; margin: 1rem 0; }
+  svg text { fill: var(--ink); font: 13px system-ui, sans-serif; }
+  svg .box { fill: var(--card); stroke: var(--line); }
+  svg .arrow { stroke: var(--accent); stroke-width: 2; fill: none; marker-end: url(#a); }
+  svg .sub { fill: var(--muted); font-size: 11.5px; }
+  ul li { margin: .35rem 0; }
+  .v-true { color: var(--true); font-weight: 600; } .v-false { color: var(--false); font-weight: 600; }
+  details { margin: .6rem 0; } summary { cursor: pointer; color: var(--accent); }
+  pre { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: .7rem; overflow-x: auto; font: .85em ui-monospace, Consolas, monospace; }
+  footer { color: var(--muted); font-size: .9rem; margin-top: 2.5rem; }
+</style>
+</head>
+<body>
+<main>
+<h1>Claim Check: app map</h1>
+<p class="lede">A one-page guide to where things live. A snapshot of the code at the commit named at the bottom; it can drift as the code changes.</p>
+
+<h2>What the app does</h2>
+<p>A small-business owner pastes a cold "your website has problems" email and their web address. Claim Check finds each claim in the email, downloads the home page once, and marks every claim <span class="v-true">True</span> (the problem is really there), <span class="v-false">False</span> (the page's own code says otherwise) or <em>Can't be checked from outside</em> (rankings, penalties, traffic and the like), each with the evidence it used.</p>
+<p>It is one Cloudflare Worker with no dependencies, no keys and no storage. Four pieces do the work:</p>
+<ul>
+  <li><code>src/claims.js</code> and <code>src/claim-types.js</code> find the claims in the email.</li>
+  <li><code>src/fetch-site.js</code> downloads the home page (10 s limit, 5 redirects).</li>
+  <li><code>src/judge.js</code> gives each claim a verdict and its evidence.</li>
+  <li><code>src/page.js</code> is the whole web page; <code>src/worker.js</code> joins the pieces and answers <code>GET /</code> and <code>POST /check</code>.</li>
+</ul>
+
+<h2>One action, end to end: press "Check"</h2>
+<svg viewBox="0 0 720 210" role="img" aria-labelledby="dt">
+  <title id="dt">Pressing Check sends the email and address to POST /check; the worker finds claims, fetches the site, judges each claim, and the page draws one row per claim.</title>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor" style="color:var(--accent)"/></marker></defs>
+  <rect class="box" x="8" y="20" width="150" height="70" rx="8"/>
+  <text x="20" y="46">Browser page</text><text class="sub" x="20" y="66">src/page.js</text><text class="sub" x="20" y="81">form submit</text>
+  <rect class="box" x="200" y="20" width="150" height="70" rx="8"/>
+  <text x="212" y="46">POST /check</text><text class="sub" x="212" y="66">src/worker.js</text><text class="sub" x="212" y="81">check()</text>
+  <rect class="box" x="392" y="8" width="150" height="54" rx="8"/>
+  <text x="404" y="31">Find claims</text><text class="sub" x="404" y="49">claims.js findClaims()</text>
+  <rect class="box" x="392" y="76" width="150" height="54" rx="8"/>
+  <text x="404" y="99">Fetch home page</text><text class="sub" x="404" y="117">fetch-site.js fetchSite()</text>
+  <rect class="box" x="392" y="144" width="150" height="54" rx="8"/>
+  <text x="404" y="167">Judge each claim</text><text class="sub" x="404" y="185">judge.js judge()</text>
+  <rect class="box" x="580" y="20" width="132" height="70" rx="8"/>
+  <text x="592" y="46">Result table</text><text class="sub" x="592" y="66">page.js draw()</text><text class="sub" x="592" y="81">one row per claim</text>
+  <path class="arrow" d="M158 55H196"/>
+  <path class="arrow" d="M350 45L388 35"/>
+  <path class="arrow" d="M350 62L388 100"/>
+  <path class="arrow" d="M350 78L388 166"/>
+  <path class="arrow" d="M542 171C570 171 590 140 640 94"/>
+</svg>
+
+<h2>Reference route (three stops)</h2>
+<p>A route to read in your editor. Search for the anchor in each file.</p>
+<ol class="route">
+  <li><strong>The request comes in: <code>src/worker.js</code>, search <code>export async function check</code></strong>
+  Splits the work in order: find the claims, fetch the site only if some claim can be checked from the page (<code>needsSite</code>), judge each claim, then add up the verdicts and the notes shown under the table.</li>
+  <li><strong>Which words count as a claim: <code>src/claim-types.js</code>, search <code>CLAIM_TYPES</code></strong>
+  A plain list of claim types and the phrasings that trigger them. First match per clause wins, so specific types sit above broad ones. A type with a <code>reason</code> is one nobody can check from outside; that reason is shown as its evidence.</li>
+  <li><strong>The verdict: <code>src/judge.js</code>, search <code>const CHECKS</code> and <code>export async function judge</code></strong>
+  One small check per type, each reading the downloaded page's code (the <code>&lt;title&gt;</code>, the meta tags, the <code>&lt;h1&gt;</code>, the links...) and returning a verdict plus a sentence of evidence that quotes the page.</li>
+</ol>
+
+<h2>To change this, start here</h2>
+<ul>
+  <li><strong>Catch a new phrasing</strong> of an existing claim ("your site is invisible on phones"): add a pattern to that type in <code>src/claim-types.js</code>, then a line in <code>test/claims.test.js</code>.</li>
+  <li><strong>Add a new kind of claim</strong>: a new entry in <code>CLAIM_TYPES</code>, a matching function in <code>CHECKS</code> in <code>src/judge.js</code> (or a <code>reason</code> if it can't be checked from outside), a test in <code>test/judge.test.js</code>, and a row in the README's "What it checks" table. The "site is down" and "no H1" types were added exactly this way in the final review.</li>
+  <li><strong>Change the wording people see</strong>: verdict sentences live in <code>src/judge.js</code>; headings, labels and the empty/error messages live in <code>src/page.js</code> and <code>src/worker.js</code>.</li>
+  <li><strong>Change the limits</strong> (timeout, redirects, how many links are tried): the constants at the top of <code>src/fetch-site.js</code> and <code>MAX_LINKS</code> in <code>src/judge.js</code>.</li>
+</ul>
+
+<h2>A practice to reuse</h2>
+<p><strong>Keep phrasings as data and checks as code, and let a real run find the gaps.</strong> The spec chose a fixed claim library over a language model (<code>devpost/spec.md</code>), which kept the build inside one Worker with no keys. In the final review, a run against made-up awkward emails showed two common scare lines ("your site is down", "no H1") that produced no row at all. Because phrasings are data, each fix was one library entry, one small check and two tests (<code>test/claims.test.js</code>, <code>test/judge.test.js</code>), not a redesign. On another project: write the rules a feature recognises as a list you can extend, and before calling it done, try inputs you did not plan for and treat "nothing happened" as a finding.</p>
+<details><summary>What one claim type looks like</summary>
+<pre>{ type: "heading", label: "Main heading (H1)",
+  patterns: [/\bh1\b/i, /main (heading|headline)/i] },</pre>
+</details>
+
+<h2>Run it again</h2>
+<pre>npm test                       # 29 tests, Node's built-in runner
+npx wrangler@4 dev             # then open http://localhost:8787</pre>
+<footer>Map made from the code after the final review, on top of commit f0cf3510 (2026-10-17). No network, scripts or tracking on this page.</footer>
+</main>
+</body>
+</html>

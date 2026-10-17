@@ -1,0 +1,30 @@
+SAMPLE DATA. Fixture A: one of the real cold audit emails this project's builder sent in
+October 2026, with the business renamed to "Dana's Plumbing" and the sender's name and
+postal address replaced. The paragraph after "P.S." is invented scare copy of the kind
+these emails often add, appended so the demo shows uncheckable claims too.
+---
+Subject: Dana's Plumbing: 3 things I noticed on your website
+
+Hi Dana's Plumbing team,
+
+I checked danasplumbing.com today (I am nearby) and found 3 things that cost you customers, worst first:
+
+1. no mobile viewport tag - the site renders as a shrunken desktop page on phones, where most local customers look
+2. no meta description - Google writes its own snippet for you
+3. the exact WordPress version is published in the page source (attackers search for sites by version)
+
+One of them is fixed below, free, no strings - paste it in or hand it to whoever runs the site:
+
+    <meta name="viewport" content="width=device-width, initial-scale=1"> inside <head>
+
+I can fix all of it for a fixed $150, paid only after it works on your side. Payment goes through Upwork's escrow (you do not need an account) or a plain invoice after delivery. Usually done within two days of getting access.
+
+Reply 'yes' or ask me anything, and I will send the exact list and the plan.
+
+P.S. Our scan also shows you have dropped in the Google rankings this month. You're losing customers to competitors who show up first. Hackers target sites like yours every day. Your site isn't secure and there's no padlock in the address bar. It takes forever to load, it has broken links, and your page title is missing.
+
+[Sender name]
+[Sender postal address]
+
+An AI system I run checked your site and wrote this email; I am responsible for the work.
+If you would rather not hear from me again, reply 'stop' and I will not write again.
